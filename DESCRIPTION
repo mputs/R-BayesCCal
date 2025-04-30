@@ -10,6 +10,9 @@ Encoding: UTF-8
 Depends:
     R (>= 4.1)
 Imports:
-	reticulate
+	reticulate,
+	cli
+Suggests:
+	caret
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2

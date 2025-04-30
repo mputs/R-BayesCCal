@@ -3,48 +3,54 @@
 #' Creates a virtualenv and installs the BayesCCal Python package.
 #' @param envname Name of the virtualenv to create/use.
 #' @param python Optional path to a Python 3 executable. If NULL, one is auto-detected.
+#' @param typpe Installation type: "miniconda" or "virtualenv"
 #' @export
-install_BayesCCal <- function(envname = "BCCenv", python = NULL) {
+install_BayesCCal <- function(envname = "BCCenv", python = NULL, type = c("miniconda", "virtualenv")) {
+	type = match.arg(type)
 
-	# Try to find a suitable Python 3 binary
-	if (is.null(python)) {
-		py_config <- tryCatch(reticulate::py_discover_config(), error = function(e) NULL)
+	if (type == "miniconda") {
+		miniconda = reticulate::miniconda_path()
 
-		if (!is.null(py_config) && py_config$version >= "3.0") {
-			python <- py_config$python
-			message("Using detected Python: ", python)
-		} else {
-			# Try some known options
-			candidates <- c("python3", "/usr/bin/python3", "/opt/homebrew/bin/python3", "python")
-			for (cmd in candidates) {
-				if (reticulate::py_available(initialize = FALSE, python = cmd)) {
-					version <- tryCatch(reticulate::py_config(python = cmd)$version, error = function(e) NULL)
-					if (!is.null(version) && as.numeric(substr(version, 1, 1)) >= 3) {
-						python <- cmd
-						message("Using fallback Python: ", python)
-						break
-					}
-				}
-			}
-
-			if (is.null(python)) {
-				stop("Could not find a suitable Python 3 executable. Please install Python 3.")
-			}
+		if (!file.exists(miniconda)) {
+			message("Installing Miniconda...")
+			reticulate::install_miniconda()
 		}
+
+		if (!reticulate::condaenv_exists(envname)) {
+			reticulate::conda_create(envname, packages = "python>=3.8")
+		}
+
+		cli::cli_inform("Installing BayesCCal into conda environment: {.val envname}")
+
+		tryCatch({
+			reticulate::conda_install(envname, packages = "BayesCCal", pip = TRUE)
+		}, error = function(e) {
+			cli::cli_alert_danger("Installation of {.pkg BayesCCal} failed: {e$message}")
+			stop(e)
+		})
+
+		reticulate::use_condaenv(envname, required = TRUE)
+
+		envdir = paste0(reticulate::miniconda_path(), "/envs/", envname)
+		cli::cli_alert_success("Installation of miniconda successfull. Using environment {.val {envdir}}")
+	} else {
+		# Create virtualenv if needed
+		if (!reticulate::virtualenv_exists(envname)) {
+			cli::cli_inform("Creating virtualenv {.strong {envname}}")
+			if (is.null(python)) {
+				python_config = reticulate::py_discover_config()
+				cli::cli_inform("Using Python {python_config$version} found at {.val {python}}")
+			}
+			reticulate::virtualenv_create(envname, python = python)
+		}
+		reticulate::virtualenv_install(envname, packages = "BayesCCal")
+		reticulate::use_virtualenv(envname)
+
+		envdir = paste0(reticulate::virtualenv_root(), "/", envname)
+		cli::cli_alert_success("Installation via virtualenv successful. Using environment {.val {envdir}}")
 	}
-
-	# Create virtualenv if needed
-	if (!reticulate::virtualenv_exists(envname)) {
-		message("Creating virtualenv: ", envname)
-		reticulate::virtualenv_create(envname, python = python)
-	}
-
-	# Install Python package
-	message("Installing Python packages into: ", envname)
-	reticulate::virtualenv_install(envname, packages = c("BayesCCal", "pandas"))
-
-	reticulate::use_virtualenv(envname)
-
+	source_BCC_py()
 	.BCC$env_name = envname
-	message("Done!")
+	.BCC$env_set = TRUE
 }
+
