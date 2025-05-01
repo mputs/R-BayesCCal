@@ -1,3 +1,4 @@
+\donttest{
 # Load packages
 library(caret)
 library(tidymodels)
@@ -5,7 +6,9 @@ library(dplyr)
 library(tibble)
 
 # Read and prepare data
-url <- "https://archive.ics.uci.edu/ml/machine-learning-databases/00267/data_banknote_authentication.txt"
+url <- paste0("https://archive.ics.uci.edu/ml/",
+  "machine-learning-databases/00267/",
+  "data_banknote_authentication.txt")
 data <- read.csv(url, header = FALSE)
 colnames(data) <- c("variance", "skewness", "kurtosis", "entropy", "class")
 
@@ -22,26 +25,32 @@ test  <- testing(split)
 
 # Train logistic regression with caret
 fit_glm_caret <- train(class ~ ., data = train,
-					   method = "glm", family = "binomial",
-					   trControl = trainControl(classProbs = TRUE))
+  method = "glm", family = "binomial",
+  trControl = trainControl(classProbs = TRUE))
 
 # Predict with y present
-res1 <- predict_calibrated(fit_glm_caret, new_data = test,
-						   train_data = train, train_labels = train$class)
+res1 <- predict_calibrated(fit_glm_caret,
+  new_data = test,
+  train_data = train,
+  train_labels = train$class)
 
 # Predict with y absent
-res2 <- predict_calibrated(fit_glm_caret, new_data = test %>% select(-class),
-						   train_data = train, train_labels = train$class)
+res2 <- predict_calibrated(fit_glm_caret,
+  new_data = test %>% select(-class),
+  train_data = train,
+  train_labels = train$class)
 
 ## caret - random forest
 
 # Train random forest with caret
 fit_rf_caret <- train(class ~ ., data = train,
-					  method = "rf",
-					  trControl = trainControl(classProbs = TRUE))
+  method = "rf",
+  trControl = trainControl(classProbs = TRUE))
 
-res3 <- predict_calibrated(fit_rf_caret, new_data = test,
-						   train_data = train, train_labels = train$class)
+res3 <- predict_calibrated(fit_rf_caret,
+  new_data = test,
+  train_data = train,
+  train_labels = train$class)
 
 
 # tidymodels - logistic regression
@@ -55,15 +64,22 @@ glm_wf <- workflow() %>% add_model(glm_spec) %>% add_recipe(rec)
 # Fit
 fit_glm_tidymodels <- glm_wf %>% fit(data = train)
 
-res4 <- predict_calibrated(fit_glm_tidymodels, new_data = test,
-						   train_data = train, train_labels = train$class)
+res4 <- predict_calibrated(fit_glm_tidymodels,
+  new_data = test,
+  train_data = train,
+  train_labels = train$class)
 
 # tidymodels - random forest
 
-rf_spec <- rand_forest(trees = 100) %>% set_engine("ranger", importance = "impurity") %>% set_mode("classification")
+rf_spec <- rand_forest(trees = 100) %>%
+  set_engine("ranger", importance = "impurity") %>%
+  set_mode("classification")
 
 rf_wf <- workflow() %>% add_model(rf_spec) %>% add_recipe(rec)
 fit_rf_tidymodels <- rf_wf %>% fit(data = train)
 
-res5 <- predict_calibrated(fit_rf_tidymodels, new_data = test,
-						   train_data = train, train_labels = train$class)
+res5 <- predict_calibrated(fit_rf_tidymodels,
+  new_data = test,
+  train_data = train,
+  train_labels = train$class)
+}

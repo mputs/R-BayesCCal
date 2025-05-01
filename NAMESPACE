@@ -2,3 +2,8 @@
 
 export(.BCC)
 export(install_BayesCCal)
+export(predict_calibrated)
+import(cli)
+import(reticulate)
+import(rlang)
+importFrom(stats,predict)

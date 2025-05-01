@@ -38,11 +38,13 @@
 source_BCC_py = function() {
 	# Source the Python helper script
 	py_script <- system.file("python", "RBayesCCal.py", package = "BayesCCal")
+	Rcalibrator_binary = NULL
 	if (file.exists(py_script)) {
 		reticulate::source_python(py_script)
 	} else {
 		cli::cli_alert_warning("Python helper script not found at {.file {py_script}}.")
 	}
+	.BCC$Rcalibrator_binary = Rcalibrator_binary
 }
 
 

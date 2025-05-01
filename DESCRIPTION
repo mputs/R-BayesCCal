@@ -2,17 +2,21 @@ Package: BayesCCal
 Title: Bayesian Calibration of Classifiers
 Version: 0.1
 Authors@R: c(
-	person("Marco", "Puts", email = "mputs@acm.org", role = ("aut", "ctb")),
+	person("Marco", "Puts", email = "mputs@acm.org", role = c("aut", "ctb")),
 	person("Martijn", "Tennekes", email = "mtennekes@gmail.com", role = c("aut", "cre")))
 Description: Calibration of (binary) classifiers is done using a Bayesian method. First the "proportion positives" is estimated. After that, the probability of an item being positive is estimated.
-License: BSD 3
+License: BSD_3_clause + file LICENSE
 Encoding: UTF-8
 Depends:
     R (>= 4.1)
 Imports:
 	reticulate,
-	cli
+	cli,
+	rlang
 Suggests:
-	caret
+	caret,
+	tidymodels,
+	dplyr,
+	tibble
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2

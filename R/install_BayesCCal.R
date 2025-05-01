@@ -3,7 +3,11 @@
 #' Creates a virtualenv and installs the BayesCCal Python package.
 #' @param envname Name of the virtualenv to create/use.
 #' @param python Optional path to a Python 3 executable. If NULL, one is auto-detected.
-#' @param typpe Installation type: "miniconda" or "virtualenv"
+#' @param type Installation type: "miniconda" or "virtualenv"
+#' @import cli
+#' @import rlang
+#' @import reticulate
+#' @importFrom stats predict
 #' @export
 install_BayesCCal <- function(envname = "BCCenv", python = NULL, type = c("miniconda", "virtualenv")) {
 	type = match.arg(type)
