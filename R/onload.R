@@ -24,9 +24,12 @@
 			"!" = "Python module {.pkg BayesCCal} not found in the active environment.",
 			">" = "Run {.code install_BayesCCal()} to create the environment and install the package."
 		))
+		lib_set = FALSE
+	} else {
+		lib_set = TRUE
 	}
 
-	if (env_set) {
+	if (env_set && lib_set) {
 		source_BCC_py()
 	}
 

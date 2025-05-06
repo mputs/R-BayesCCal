@@ -9,6 +9,8 @@ library(tibble)
 url <- paste0("https://archive.ics.uci.edu/ml/",
   "machine-learning-databases/00267/",
   "data_banknote_authentication.txt")
+
+url = "sandbox/data_banknote_authentication.txt"
 data <- read.csv(url, header = FALSE)
 colnames(data) <- c("variance", "skewness", "kurtosis", "entropy", "class")
 
@@ -71,7 +73,7 @@ res4 <- predict_calibrated(fit_glm_tidymodels,
 
 # tidymodels - random forest
 
-rf_spec <- rand_forest(trees = 100) %>%
+rf_spec <- rand_forest(trees = 4) %>%
   set_engine("ranger", importance = "impurity") %>%
   set_mode("classification")
 

@@ -24,8 +24,8 @@ install_BayesCCal <- function(envname = "BCCenv", python = NULL, type = c("minic
 			reticulate::conda_create(envname, packages = "python>=3.8")
 		}
 
-		cli::cli_inform("Installing BayesCCal into conda environment: {.val envname}")
-
+		cli::cli_inform("Installing BayesCCal into conda environment: {.val {envname}}")
+browser()
 		tryCatch({
 			reticulate::conda_install(envname, packages = "BayesCCal", pip = TRUE)
 		}, error = function(e) {

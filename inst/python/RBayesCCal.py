@@ -40,7 +40,6 @@ class Rcalibrator_binary(calibrator_binary):
     def calcDensities(self, p, y):
         p = np.array(p)
         y = np.array(y)
-        print(p.shape,y.shape)
         pxt = p[y==1]
         pxf = p[y==0]        
         self.density_t.init(pxt);
